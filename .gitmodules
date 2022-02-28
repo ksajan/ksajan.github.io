@@ -1,0 +1,3 @@
+[submodule "portfolio/themes/researcher"]
+	path = portfolio/themes/researcher
+	url = https://github.com/ojroques/hugo-researcher.git
