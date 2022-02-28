@@ -1,0 +1,5 @@
+baseurl      = "localhost"
+title        = "Machine Learning Engineer/ Researcher"
+languageCode = "en-us"
+theme        = "researcher"
+paginate     = 1
