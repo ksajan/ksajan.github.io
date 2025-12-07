@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const darkCircle = document.getElementById('dark-circle');
   const lightCircle = document.getElementById('light-circle');
 
-  // Default: light theme
-  let theme = localStorage.getItem('theme') || 'light';
+  // Default: dark theme
+  let theme = localStorage.getItem('theme') || 'dark';
 if(toggleButton){
   // Apply theme
   if (theme === 'dark') {
@@ -306,7 +306,6 @@ function updateGiscusTheme() {
     'https://giscus.app'
   );
 }
-
 
 
 
