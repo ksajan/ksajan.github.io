@@ -1,0 +1,16 @@
+{{- /* Fallback JSON output for sections without a custom template */ -}}
+{{- $items := slice -}}
+{{- range .Pages -}}
+  {{- if not .Params.draft -}}
+    {{- $item := dict
+      "title" .Title
+      "url" .RelPermalink
+      "summary" (.Summary | plainify)
+      "tags" (.Params.tags | default (slice))
+      "categories" (.Params.categories | default (slice))
+      "date" (.Date.Format "2006-01-02")
+    -}}
+    {{- $items = $items | append $item -}}
+  {{- end -}}
+{{- end -}}
+{{- $items | jsonify -}}

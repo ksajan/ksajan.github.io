@@ -1,0 +1,98 @@
+[homepage]
+  onlyPostsInHomePage = false
+  homePageLogo = false
+  homePageTitle = "Sajan Kumar"
+  homePageTagLine = "Senior ML Engineer"
+  homePageLogoPath = ""
+  homePageAbout = "Senior Machine Learning Engineer who has shipped LLM agents, real-time vision, and DeFi/security platforms from first prototype to production scale—grounded in strong software engineering."
+  homePageCoverPath = "images/headshot.jpg"
+  homePageCoverTitle = "I build AI systems that scale from prototype to millions of users."
+  homePageCoverTagLine = "5+ years shipping production ML across YC startups, enterprise security, and distributed systems."
+  homePageCurrent = "Currently building at Abstract Security"
+  homePageSummaryLength = 420
+  homePagePostDate = true
+  dateFormat = "Jan 2, 2006"
+  showSocialLinksHome = true
+
+[fonts]
+  siteFont = "Inter, \"Helvetica Neue\", Arial, sans-serif"
+
+[social]
+  github = "https://github.com/ksajan"
+  linkedin = "https://www.linkedin.com/in/ksajan"
+  x = "https://x.com/ksajan"
+  email = "mailto:kumar836@purdue.edu"
+
+[theme]
+  showDarkModeToggle = true
+  showSearchIcon = true
+  showGoToTop = true
+  darkModeColor = "#333333"
+  lightModeColor = "white"
+  darkModeLinkColor = "#CCCCCC"
+  lightModeLinkColor = "#007bff"
+  heroSectionColor = "white"
+  darkHeroSectionColor = "black"
+  lightModeButton = "#007bff"
+  lightModeButtonText = "#ffffff"
+  lightModeButtonAlt = "transparent"
+  lightModeButtonAltText = "#007bff"
+  darkModeButton = "#0d6efd"
+  darkModeButtonText = "#ffffff"
+  darkModeButtonAlt = "transparent"
+  darkModeButtonAltText = "#4d9aff"
+
+[toc]
+  numberingInTOC = false
+  numberingInPost = false
+
+[posts]
+  readingSpeed = 220
+  showFrontMatter = true
+  showDate = true
+  showWordCount = true
+  showAuthors = true
+  showTags = false
+  showCategories = false
+  showReadingTime = true
+  dateFormat = "Jan 2, 2006"
+  showTagCloud = false
+  showCategoryCloud = false
+  showAuthorCloud = false
+
+[rss]
+  showRSS = false
+
+[about]
+  showSocialLinksPage = true
+
+[sections]
+  showDate = true
+  showTags = false
+  showCategories = true
+  showAuthors = true
+  showCoverImage = true
+  showSummary = true
+  showReadMore = true
+  summaryLength = 240
+  dateFormat = "Jan 2, 2006"
+
+[slideshow]
+  maxSize = 20
+
+  [giscus]
+    enable = false
+    src = "https://giscus.app/client.js"
+    dataRepo = ""
+    dataRepoId = ""
+    dataCategory = ""
+    dataCategoryId = ""
+    dataMapping = ""
+    dataStrict = ""
+    dataReactionsEnabled = ""
+    dataEmitMetadata = ""
+    dataInputPosition = ""
+    dataTheme = ""
+    dataLang = ""
+    dataLoading = ""
+    crossorigin = ""

@@ -1,0 +1,63 @@
+{{ $imagePath := .Site.Params.homepage.homePageCoverPath }}
+{{ $contactLink := .Site.Params.social.email | default "mailto:kumar836@purdue.edu" }}
+
+{{/* Hero Section tailored for portfolio */}}
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-name">{{ .Site.Title }}</h1>
+      <p class="hero-eyebrow">{{ .Site.Params.homepage.homePageTagLine }}</p>
+      <h2 class="hero-title">{{ .Site.Params.homepage.homePageCoverTitle }}</h2>
+      <p class="hero-subtitle">{{ .Site.Params.homepage.homePageCoverTagLine }}</p>
+      {{ with .Site.Params.homepage.homePageCurrent }}
+      <p class="hero-status">{{ . }}</p>
+      {{ end }}
+      <div class="hero-cta">
+        <a href="{{ "projects/" | relURL }}" class="btn btn-primary">See my work</a>
+        <a href="{{ "pages/resume/" | relURL }}" class="btn btn-secondary">Resume</a>
+        <a href="{{ $contactLink }}" class="btn btn-secondary">Let's talk</a>
+      </div>
+    </div>
+    {{ if $imagePath }}
+    <div class="hero-image">
+      <img src="{{ $imagePath | relURL }}" alt="{{ .Site.Title }}" />
+    </div>
+    {{ end }}
+  </div>
+</section>
+
+{{/* Latest writing */}}
+{{ $posts := first 3 (sort (where site.RegularPages "Section" "posts") "Date" "desc") }}
+{{ if gt (len $posts) 0 }}
+<section class="recent-posts-section">
+  <div class="section-header">
+    <h2>Latest Writing</h2>
+    <p>Notes on systems I am building and lessons learned.</p>
+  </div>
+  <div class="posts-grid">
+    {{ range $posts }}
+    <article class="post-card">
+      <div class="post-content">
+        <div class="post-meta">
+          {{ partial "terms.html" (dict "taxonomy" "authors" "page" .) }}
+          <span class="post-date">{{ .Date | time.Format ":date_long" }}</span>
+        </div>
+        <h3 class="post-title">
+          <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        </h3>
+        <p class="post-summary">{{ .Summary | plainify | truncate 200 }}</p>
+        <div class="post-footer">
+          {{ $readingTime := div (float .WordCount) .Site.Params.posts.readingSpeed }}
+          {{ $readingTime = math.Ceil $readingTime }}
+          <span class="reading-time">{{ $readingTime }} min read</span>
+          <a href="{{ .RelPermalink }}" class="read-more">Read More →</a>
+        </div>
+      </div>
+    </article>
+    {{ end }}
+  </div>
+  <div class="section-header">
+    <a href="{{ "posts/" | relURL }}" class="read-more">View all writing →</a>
+  </div>
+</section>
+{{ end }}
