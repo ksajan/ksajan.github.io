@@ -1051,6 +1051,8 @@ background-color: rgba(0, 0, 0, 0.464);
 .header-nav a {
   text-decoration: none;
   color: inherit;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 /* Hamburger Icon */
@@ -2030,7 +2032,7 @@ section {
   border-radius: 5rem;
   color: inherit;
   padding: 6rem 2rem;
-  margin: 2rem auto 0 auto;
+  margin: 6rem auto 0 auto;
   width: 85vw;
   max-width: 90%;
 }
