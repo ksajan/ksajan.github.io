@@ -7,8 +7,8 @@ tags = ["resume"]
 categories = ["about"]
 +++
 
-<object data="/resume.pdf" type="application/pdf" width="100%" height="900px">
+<p><a href="/resume.pdf"><u><strong>Download the resume</strong></u></a></p>
+
+<object data="/resume.pdf" type="application/pdf" width="100%" height="1100px">
   <p>Your browser can't display PDFs. <a href="/resume.pdf">Download the resume</a> instead.</p>
 </object>
-
-If the embedded view does not load, use the link above to download a copy.

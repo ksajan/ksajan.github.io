@@ -25,7 +25,7 @@
 
 [theme]
   showDarkModeToggle = true
-  showSearchIcon = true
+  showSearchIcon = false
   showGoToTop = true
   darkModeColor = "#333333"
   lightModeColor = "white"

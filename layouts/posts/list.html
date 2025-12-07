@@ -1,0 +1,100 @@
+{{ define "main" }}
+<section class="posts-info-box writing-header">
+  <h1>Writing</h1>
+  <p>Notes on systems I'm building and lessons learned.</p>
+
+  <div class="writing-filters">
+    <div class="writing-search">
+      <input type="search" id="writingSearch" placeholder="Search by title or content..." autocomplete="off" />
+      <span class="search-icon">🔍</span>
+    </div>
+    <div class="writing-tags" id="writingTags">
+      <button class="tag-pill active" data-tag="all">All</button>
+      {{ $tags := slice }}
+      {{ range .Pages }}
+        {{ with .Params.tags }}
+          {{ range . }}
+            {{ $tags = $tags | append . }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ $tags = uniq $tags | sort }}
+      {{ range $tags }}
+        <button class="tag-pill" data-tag="{{ . }}">{{ . }}</button>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<div id="writingResults" class="section-list list-view writing-list">
+  {{ range .Pages }}
+  <article class="section-main-box writing-card"
+    data-title="{{ .Title | plainify }}"
+    data-summary="{{ .Summary | plainify }}"
+    data-tags="{{ delimit (.Params.tags | default (slice)) "," }}">
+    <div class="section-card-body">
+      <h2 id="section-post-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <div class="section-meta-data-div">
+        <span>{{ .Date.Format "Jan 2, 2006" }}</span>
+        <span aria-hidden="true">•</span>
+        <span>{{ .ReadingTime }} min read</span>
+      </div>
+      {{ $plain := .Summary | plainify }}
+      <p>{{ $plain }}</p>
+      <p><a href="{{ .RelPermalink }}">Read article →</a></p>
+      <div class="result-tags">
+        {{ range .Params.tags }}
+          <span class="tag-pill small">{{ . }}</span>
+        {{ end }}
+      </div>
+    </div>
+  </article>
+  {{ end }}
+</div>
+
+<script>
+  (() => {
+    const searchInput = document.getElementById('writingSearch');
+    const tagButtons = Array.from(document.querySelectorAll('#writingTags .tag-pill'));
+    const cards = Array.from(document.querySelectorAll('.writing-card'));
+    let activeTag = 'all';
+
+    function normalize(str) {
+      return (str || '').toLowerCase();
+    }
+
+    function filter() {
+      const q = normalize(searchInput.value);
+      cards.forEach(card => {
+        const title = normalize(card.dataset.title);
+        const summary = normalize(card.dataset.summary);
+        const tags = (card.dataset.tags || '').split(',').map(normalize);
+        const matchesText = q === '' || title.includes(q) || summary.includes(q);
+        const matchesTag = activeTag === 'all' || tags.includes(normalize(activeTag));
+        const visible = matchesText && matchesTag;
+        card.style.display = visible ? '' : 'none';
+      });
+    }
+
+    tagButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag;
+        const currentlyActive = activeTag;
+        if (tag === currentlyActive || tag === 'all') {
+          activeTag = 'all';
+          tagButtons.forEach(b => b.classList.remove('active'));
+          const allBtn = tagButtons.find(b => b.dataset.tag === 'all');
+          if (allBtn) allBtn.classList.add('active');
+        } else {
+          activeTag = tag;
+          tagButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        }
+        filter();
+      });
+    });
+
+    searchInput.addEventListener('input', filter);
+  })();
+</script>
+{{ end }}

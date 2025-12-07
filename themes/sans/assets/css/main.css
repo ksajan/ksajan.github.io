@@ -129,6 +129,16 @@ footer {
   margin-bottom: 2rem;
 }
 
+.prev-next-div .prev-link {
+  text-align: left;
+  flex: 1;
+}
+
+.prev-next-div .next-link {
+  text-align: right;
+  flex: 1;
+}
+
 .taxo-clouds {
   border: 1px solid black;
   padding: 0.5rem;
@@ -197,6 +207,117 @@ footer {
   color: var(--btn-primary-color);
 }
 
+.writing-header h1 {
+  margin-bottom: 0.25rem;
+}
+
+.writing-header p {
+  margin-top: 0;
+  color: var(--text-secondary, #555);
+}
+
+.writing-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.writing-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.writing-search input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.5rem;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: var(--light-color);
+  color: inherit;
+}
+
+body.dark-mode .writing-search input {
+  background: #222;
+  border-color: rgba(255,255,255,0.1);
+}
+
+.writing-search .search-icon {
+  position: absolute;
+  left: 0.75rem;
+  opacity: 0.6;
+}
+
+.writing-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.tag-pill {
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.04);
+  color: inherit;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.tag-pill.small {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.tag-pill.active {
+  background: var(--btn-primary-bg);
+  color: #fff;
+  border-color: var(--btn-primary-bg);
+}
+
+body.dark-mode .tag-pill {
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+}
+
+body.dark-mode .tag-pill.active {
+  color: #fff;
+  border-color: var(--btn-primary-bg);
+  background: var(--btn-primary-bg);
+}
+
+.writing-card {
+  border-left: 4px solid var(--btn-primary-bg);
+  padding-left: 1rem;
+}
+
+.writing-card h2 a {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.writing-card .section-meta-data-div {
+  gap: 0.5rem;
+  color: var(--text-secondary, #555);
+}
+
+.writing-card p:last-of-type {
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+body.dark-mode .writing-search input {
+  color: #f5f5f5;
+}
+
+@media (max-width: 768px) {
+  .writing-card h2 a {
+    font-size: 1.35rem;
+  }
+}
 .section-list {
   display: grid;
   gap: 1rem;
