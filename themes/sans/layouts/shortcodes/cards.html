@@ -1,0 +1,27 @@
+<div class="cards-box">
+  {{- $cards := split (strings.TrimSpace .Inner) "<!--card-->" -}}
+  {{- range $cards }}
+    {{- $lines := split (strings.TrimSpace .) "\n" -}}
+    {{- $title := "" -}}
+    {{- $content := "" -}}
+    {{- range $lines }}
+        {{- if hasPrefix . "title:" -}}
+            {{- $title = strings.TrimSpace (replace . "title:" "" ) -}}
+        {{- else if hasPrefix . "content:" -}}
+            {{- $content = strings.TrimSpace (replace . "content:" "" ) -}}
+        {{- end -}}
+    {{- end -}}
+    
+    <div class="card-individual">
+        {{- if $title }}
+            <div class="card-title">{{ $title }}</div>
+        {{- end }}
+        
+        {{- if $content }}
+            <div class="card-content">{{ $content | markdownify }}</div>
+        {{- end }}
+    </div>
+  {{- end }}
+</div>
+
+

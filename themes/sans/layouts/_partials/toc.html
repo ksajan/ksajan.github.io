@@ -1,0 +1,84 @@
+{{if .Site.Params.toc.numberingInTOC}}
+<style>
+/* Numbering with CSS counters */
+.toc-body ul {
+  counter-reset: section;
+}
+
+.toc-body li {
+  counter-increment: section;
+  position: relative;
+  padding-left: 2.5rem;
+  margin: 0.25rem 0;
+}
+
+.toc-body li::before {
+  content: counters(section, ".") " ";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+  color: inherit;
+}
+
+/* The numbering doesnt show in dark mode possibly due to color of font in added content of counter */
+/* Nested numbering */
+.toc-body li ul {
+  counter-reset: subsection;
+}
+
+.toc-body li li {
+  counter-increment: subsection;
+}
+
+.toc-body li li::before {
+  content: counters(section, ".") "." counters(subsection, ".") " ";
+}
+
+</style>
+{{end}}
+
+
+{{ if .Site.Params.toc.numberingInPost}}
+<style>
+
+
+  .main-text-container {
+        counter-reset: h2counter;
+    }
+    .main-text-container h1 {
+        counter-reset: 0;
+    }
+.main-text-container    h2:before {
+        content: counter(h2counter) ".\0000a0\0000a0";
+        counter-increment: h2counter;
+        counter-reset: h3counter;
+    }
+.main-text-container    h3:before {
+        content: counter(h2counter) "." counter(h3counter) ".\0000a0\0000a0";
+        counter-increment: h3counter;
+        counter-reset:h4counter;
+    }
+.main-text-container h4:before{
+  content: counter(h2counter) "." counter(h3counter) "." counter(h4counter) ".\0000a0\0000a0";
+  counter-increment:h4counter;
+}
+</style>
+{{end}}
+
+{{ if and (gt .WordCount 400) (ne .Params.toc false) }}
+<div class="toc-container">
+    <div class="toc-title" onclick="toggleTOC(this)">Contents ▾</div>
+    <div class="toc-body">
+        {{ .TableOfContents }}
+    </div>
+</div>
+{{ end }}
+
+
+<script>
+  function toggleTOC(titleEl) {
+  const body = titleEl.nextElementSibling;
+  body.style.display = (body.style.display === 'none') ? 'block' : 'none';
+  titleEl.textContent = body.style.display === 'none' ? 'Contents ▸' : 'Contents ▾';
+}
+</script>

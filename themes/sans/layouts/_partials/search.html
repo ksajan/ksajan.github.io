@@ -1,0 +1,155 @@
+
+{{if eq .Site.Params.theme.showSearchIcon true}}
+
+<!-- Search Icon Button -->
+<button class="search-icon-btn" id="searchIconBtn" aria-label="Search">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+    </svg>
+</button>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-container">
+        <button class="search-close" id="searchClose" aria-label="Close search"></button>
+        
+        <div class="search-input-wrapper">
+            <div class="search-input-box">
+                <input type="text" id="searchInput" placeholder="Search by title or summary..." autocomplete="off">
+                <button class="clear-btn" id="clearBtn" aria-label="Clear search"></button>
+            </div>
+            <button class="search-btn" id="performSearch">Search</button>
+        </div>
+
+        <div class="search-tags" id="searchTags"></div>
+
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const searchOverlay = document.getElementById('searchOverlay');
+        const searchIconBtn = document.getElementById('searchIconBtn');
+        const searchClose = document.getElementById('searchClose');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const performSearchBtn = document.getElementById('performSearch');
+        const searchResults = document.getElementById('searchResults');
+        const searchTags = document.getElementById('searchTags');
+
+        let fuse = null;
+        let posts = [];
+        let selectedTags = new Set();
+
+        async function loadData() {
+            const res = await fetch('/posts/index.json');
+            posts = await res.json();
+            const tags = Array.from(new Set(posts.flatMap(p => p.tags || []))).sort();
+            renderTags(tags);
+            fuse = new Fuse(posts, {
+                keys: [
+                    { name: 'title', weight: 0.6 },
+                    { name: 'summary', weight: 0.3 },
+                    { name: 'tags', weight: 0.1 }
+                ],
+                threshold: 0.35,
+                ignoreLocation: true
+            });
+        }
+
+        function renderTags(tags) {
+            if (!tags.length) return;
+            searchTags.innerHTML = `<div class=\"tag-label\">Filter by tag:</div>` + tags.map(tag => `
+              <label class=\"tag-chip\">
+                <input type=\"checkbox\" value=\"${tag}\">
+                <span>${tag}</span>
+              </label>
+            `).join('');
+            searchTags.querySelectorAll('input[type=\"checkbox\"]').forEach(input => {
+                input.addEventListener('change', () => {
+                    if (input.checked) selectedTags.add(input.value);
+                    else selectedTags.delete(input.value);
+                });
+            });
+        }
+
+        searchIconBtn.addEventListener('click', () => {
+            searchOverlay.classList.add('active');
+            searchInput.focus();
+            if (!fuse) loadData();
+        });
+
+        searchClose.addEventListener('click', closeSearch);
+        searchOverlay.addEventListener('click', (e) => {
+            if (e.target === searchOverlay) {
+                closeSearch();
+            }
+        });
+
+        function closeSearch() {
+            searchOverlay.classList.remove('active');
+            searchInput.value = '';
+            clearBtn.classList.remove('active');
+            searchResults.innerHTML = '';
+            selectedTags.clear();
+            searchTags.querySelectorAll('input[type=\"checkbox\"]').forEach(i => i.checked = false);
+        }
+
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length > 0) {
+                clearBtn.classList.add('active');
+            } else {
+                clearBtn.classList.remove('active');
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.classList.remove('active');
+            searchResults.innerHTML = '';
+            searchInput.focus();
+        });
+
+        performSearchBtn.addEventListener('click', performSearch);
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        function performSearch() {
+            if (!fuse) return;
+            const query = searchInput.value.trim();
+            let results = query ? fuse.search(query).map(r => r.item) : posts;
+            if (selectedTags.size) {
+                results = results.filter(p => (p.tags || []).some(t => selectedTags.has(t)));
+            }
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class=\"no-results\">No results found</div>';
+                return;
+            }
+
+            searchResults.innerHTML = results.map(result => `
+                <div class=\"result-item\" onclick=\"window.location.href='${result.url}'\">
+                    <div class=\"result-title\">${result.title}</div>
+                    <div class=\"result-excerpt\">${result.summary || ''}</div>
+                    <div class=\"result-tags\">${(result.tags || []).map(t => `<span class='tag-pill'>${t}</span>`).join(' ')}</div>
+                </div>
+            `).join('');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
+                closeSearch();
+            }
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+{{end}}

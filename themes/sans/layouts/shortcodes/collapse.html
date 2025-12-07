@@ -1,0 +1,11 @@
+{{/*  no js for collpase handle with go. not sure exactly how this works but it does.  */}}
+{{- $title := .Get "title" | default "Click to expand" -}}
+{{- $open := .Get "open" | default "false" -}}
+{{- $id := $title | urlize | default "" -}}
+{{/*  id for button or reference purpose classes can conflict  */}}
+<details class="collapse"{{ if eq $open "true" }} open{{ end }} {{- if $id }} id="{{ $id }}"{{- end -}}>
+  <summary>{{ $title }}</summary>
+  <div class="collapse-content">
+    {{ .Inner | markdownify }}
+  </div>
+</details>

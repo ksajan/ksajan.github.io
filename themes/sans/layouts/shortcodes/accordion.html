@@ -1,0 +1,51 @@
+{{- $caption := .Get "caption" -}}
+
+{{ $accordionGroupId := .Get "id" }}
+{{ if not $accordionGroupId }}
+  {{ $accordionGroupId = printf "accordion-group-%d" .Ordinal }}
+{{ end }}
+
+<div class="accordion-box accordion-box-{{ $accordionGroupId }}" data-accordion-group="{{ $accordionGroupId }}">
+  {{ $accordions := split (strings.TrimSpace .Inner) "<!--accordion-->" }}
+
+  {{ range $index, $accordion := $accordions }}
+    {{ $lines := split (strings.TrimSpace $accordion) "\n" }}
+    {{ $title := "" }}
+    {{ $contentLines := slice }}
+    {{ $capture := false }}
+    
+    {{ range $lines }}
+      {{ if hasPrefix . "title:" }}
+        {{ $title = strings.TrimSpace (replace . "title:" "" ) }}
+      {{ else if hasPrefix . "content:" }}
+        {{ $capture = true }}
+        {{ $line := strings.TrimSpace (replace . "content:" "" ) }}
+        {{ if $line }}
+          {{ $contentLines = $contentLines | append $line }}
+        {{ end }}
+      {{ else if $capture }}
+        {{ $contentLines = $contentLines | append . }}
+      {{ end }}
+    {{ end }}
+    
+    {{ $content := delimit $contentLines "\n" }}
+    {{ $itemId := printf "%s-item-%d" $accordionGroupId $index }}
+    
+    <div class="accordion-item">
+      <button type="button" class="accordion-btn" data-accordion-target="{{ $itemId }}">
+        <span class="accordion-title-text">{{ $title }}</span>
+        <span class="accordion-icon">▶</span>
+      </button>
+      <div class="accordion-content hidden" id="{{ $itemId }}">
+        <div class="accordion-content-inner">
+          {{ $content | markdownify }}
+        </div>
+      </div>
+    </div>
+  {{ end }}
+  
+  {{- if $caption }}
+    <h3 class="accordion-caption">{{ $caption }}</h3>
+  {{- end -}}
+</div>
+

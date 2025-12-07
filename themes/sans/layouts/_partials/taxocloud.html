@@ -1,0 +1,47 @@
+{{/* 
+Taxonomy Cloud Partial for Hugo
+---------------------------------
+Usage examples:
+  {{ partial "taxocloud.html" (dict "taxonomy" "tags") }}
+  {{ partial "taxocloud.html" (dict "taxonomy" "categories") }}
+  {{ partial "taxocloud.html" (dict "taxonomy" "author") }}
+*/}}
+
+{{ $taxonomy := .taxonomy | default "tags" }}
+{{ $terms := index site.Taxonomies $taxonomy }}
+
+{{ if not $terms }}
+<p class="taxo-cloud-empty">No {{ $taxonomy }} found.</p>
+{{ else }}
+
+{{ $max := 0 }}
+{{ $min := 999999 }}
+{{ range $k, $v := $terms }}
+  {{ $count := len $v.Pages }}
+  {{ if gt $count $max }}{{ $max = $count }}{{ end }}
+  {{ if lt $count $min }}{{ $min = $count }}{{ end }}
+{{ end }}
+
+{{ $minSize := 0.65 }}
+{{ $maxSize := 1.25 }}
+
+
+  <div class="taxo-cloud" data-taxonomy="{{ $taxonomy }}">
+    {{ range $key, $value := $terms }}
+      {{ $count := len $value.Pages }}
+      {{ $range := sub $max $min }}
+      {{ if eq $range 0 }}{{ $range = 1 }}{{ end }}
+  
+       {{ $scale := div (float (sub $count $min)) (float $range) }}
+      {{ $size := add $minSize (mul $scale (sub $maxSize $minSize)) }}
+  
+      <a 
+        href="{{ $value.Page.Permalink }}" 
+        class="taxo-term"
+        style="--size:{{ printf "%.2f" $size }}rem" 
+        title="{{ $count }} {{ if eq $count 1 }}post{{ else }}posts{{ end }}">
+        {{ $key }}
+      </a>
+    {{ end }}
+  </div>
+{{ end }}

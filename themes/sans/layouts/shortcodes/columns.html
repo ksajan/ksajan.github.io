@@ -1,0 +1,11 @@
+<div class="columns">
+  <!-- footnotes doesn;t work in columns. cant seem to solve it. -->
+  {{- $cols := split .Inner "<!--col-->" -}}
+  {{- range $cols }}
+      <div class="single-column">
+      {{ . | markdownify }}
+       
+    </div>
+  {{- end }}
+</div>
+

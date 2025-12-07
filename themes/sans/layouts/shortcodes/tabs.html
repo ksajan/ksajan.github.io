@@ -1,0 +1,104 @@
+{{/* Generate unique ID - use provided id or create one from ordinal */}}
+{{ $tabGroupId := .Get "id" }}
+{{ if not $tabGroupId }}
+  {{ $tabGroupId = printf "tab-group-%d" .Ordinal }}
+{{ end }}
+
+<div class="tabs-box tabs-box-{{ $tabGroupId }}" data-tab-group="{{ $tabGroupId }}">
+  {{ $tabs := split (strings.TrimSpace .Inner) "<!--tab-->" }}
+
+  <!-- Buttons -->
+  <div class="tab-buttons">
+    {{ range $index, $tab := $tabs }}
+      {{ $lines := split (strings.TrimSpace $tab) "\n" }}
+      {{ $title := "" }}
+      {{ range $lines }}
+        {{ if hasPrefix . "title:" }}
+          {{ $title = strings.TrimSpace (replace . "title:" "" ) }}
+        {{ end }}
+      {{ end }}
+      {{ $tabId := printf "%s-tab-%d" $tabGroupId $index }}
+      <button type="button" class="tab-btn" data-tab-target="{{ $tabId }}">{{ $title }}</button>
+    {{ end }}
+  </div>
+
+  <!-- Contents -->
+  <div class="tab-contents">
+    {{ range $index, $tab := $tabs }}
+      {{ $lines := split (strings.TrimSpace $tab) "\n" }}
+      {{ $title := "" }}
+      {{ $contentLines := slice }}
+      {{ $capture := false }}
+      {{ range $lines }}
+        {{ if hasPrefix . "title:" }}
+          {{ $title = strings.TrimSpace (replace . "title:" "" ) }}
+        {{ else if hasPrefix . "content:" }}
+          {{ $capture = true }}
+          {{ $line := strings.TrimSpace (replace . "content:" "" ) }}
+          {{ if $line }}
+            {{ $contentLines = $contentLines | append $line }}
+          {{ end }}
+        {{ else if $capture }}
+          {{ $contentLines = $contentLines | append . }}
+        {{ end }}
+      {{ end }}
+      {{ $content := delimit $contentLines "\n" }}
+      {{ $tabId := printf "%s-tab-%d" $tabGroupId $index }}
+      <div class="tab-content hidden" id="{{ $tabId }}">
+        {{ $content | markdownify }}
+      </div>
+    {{ end }}
+  </div>
+</div>
+
+<script>
+(function() {
+  // Initialize tab management (only once)
+  if (!window.tabGroupInitialized) {
+    window.tabGroupInitialized = {};
+    
+    window.initTabGroup = function(groupId) {
+      const container = document.querySelector('[data-tab-group="' + groupId + '"]');
+      if (!container || window.tabGroupInitialized[groupId]) return;
+      
+      window.tabGroupInitialized[groupId] = true;
+      
+      const buttons = container.querySelectorAll('.tab-btn');
+      const contents = container.querySelectorAll('.tab-content');
+      
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetId = btn.getAttribute('data-tab-target');
+          
+          // Hide all contents in THIS group only
+          contents.forEach(c => c.classList.add('hidden'));
+          
+          // Remove active from all buttons in THIS group only
+          buttons.forEach(b => b.classList.remove('active'));
+          
+          // Show selected tab and activate button
+          document.getElementById(targetId).classList.remove('hidden');
+          btn.classList.add('active');
+        });
+      });
+      
+      // Activate first tab by default
+      if (buttons.length > 0) {
+        buttons[0].click();
+      }
+    };
+  }
+  
+  // Initialize this specific tab group
+  const groupId = '{{ $tabGroupId }}';
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      window.initTabGroup(groupId);
+    });
+  } else {
+    window.initTabGroup(groupId);
+  }
+})();
+</script>
+

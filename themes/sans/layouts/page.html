@@ -1,0 +1,84 @@
+{{ define "main" }}  
+{{ $typeOfPage := .Params.type }} 
+{{ if eq $typeOfPage "page" }} 
+<h1 data-pagefind-meta="title">{{ .Title }}</h1>
+<div class="main-text-container">{{ .Content }}</div>
+{{else}}
+ {{ with .Params.cover }} {{ $cover :=
+$.Resources.GetMatch .image }} {{ $displayImage := $.Params.cover.imageDisplay |
+default true}} {{ if $displayImage }} {{$displayCaption :=
+$.Params.cover.captionDisplay | default true}} {{ with $cover }}
+<div class="post-cover">
+  <img
+    src="{{ .RelPermalink }}"
+    alt="{{ $.Params.cover.alt | default $.Title }}"
+  />
+  {{ if $displayCaption}} {{ with $.Params.cover.caption }}
+  <p class="caption">{{ . }}</p>
+  {{ end }} {{end}}
+</div>
+{{ end }} {{ else }}
+<h2>Hello</h2>
+{{ end }} {{ end }}
+
+<div data-pagefind-body>
+  <h1 data-pagefind-meta="title">{{ .Title }}</h1>
+  {{ $showFrontMatter := .Params.showFrontMatter | default
+  .Site.Params.posts.showFrontMatter }} {{if not $showFrontMatter}} {{else}} {{
+  $readingTime := div (float .WordCount) .Site.Params.posts.readingSpeed }} {{
+  $readingTime = math.Ceil $readingTime }}
+  <div class="metadata">
+    {{ if not .Site.Params.posts.showTags}} {{else}} {{ partial "terms.html"
+    (dict "taxonomy" "tags" "page" .) }} {{end}} {{ if not
+    .Site.Params.posts.showCategories}} {{else}} {{ partial "terms.html" (dict
+    "taxonomy" "categories" "page" .) }} {{end}} {{ if not
+    .Site.Params.posts.showAuthors}} {{else}} {{ partial "terms.html" (dict
+    "taxonomy" "authors" "page" .) }} {{end}} {{ if not
+    .Site.Params.posts.showDate}} {{else}} {{ $dateMachine := .Date |
+    time.Format "2006-01-02T15:04:05-07:00" }} {{ $dateHuman := .Date |
+    time.Format .Site.Params.posts.dateFormat }}
+    <time datetime="{{ $dateMachine }}">{{ $dateHuman }}</time>
+    {{end}} {{ if not .Site.Params.posts.showWordCount}} {{else}}
+    <p>Words: {{ .WordCount }}</p>
+    {{end}} {{ if not .Site.Params.posts.showReadingTime}} {{else}}
+    <p>Reading Time: {{ $readingTime}} mins</p>
+    {{end}} {{end}}
+  </div>
+
+  {{if eq .Params.toc true}} {{ partial "toc.html" . }} {{end}} {{ $showTagCloud
+  := .Site.Params.posts.showTagCloud }} {{ $showCategoryCloud :=
+  .Site.Params.posts.showCategoryCloud }} {{ $showAuthorCloud :=
+  .Site.Params.posts.showAuthorCloud }} {{ if or $showTagCloud
+  $showCategoryCloud $showAuthorCloud }}
+  <div class="taxo-clouds">
+    <div class="tag-cloud">
+      {{ if not .Site.Params.posts.showTagCloud}} {{else}}
+      <h2>TAGS</h2>
+      {{ partial "taxocloud.html" (dict "taxonomy" "tags") }} {{end}}
+    </div>
+    <div class="category-cloud">
+      {{ if not .Site.Params.posts.showCategoryCloud}} {{else}}
+      <h2>CATEGORIES</h2>
+      {{ partial "taxocloud.html" (dict "taxonomy" "categories") }} {{end}}
+    </div>
+    <div class="author-cloud">
+      {{ if not .Site.Params.posts.showAuthorCloud}} {{else}}
+      <h2>AUTHORS</h2>
+      {{ partial "taxocloud.html" (dict "taxonomy" "authors") }} {{end}}
+    </div>
+  </div>
+  {{ end }}
+  <div class="main-text-container">{{ .Content }}</div>
+</div>
+
+
+{{ $pages := .CurrentSection.Pages.ByWeight }}
+
+<div class="prev-next-div">
+  {{ with $pages.Prev . }}
+  <a href="{{ .RelPermalink }}">Previous: {{.LinkTitle}}</a>
+  {{ end }} {{ with $pages.Next . }}
+  <a href="{{ .RelPermalink }}">Next: {{.LinkTitle}}</a>
+</div>
+{{ end }} {{ if .Site.Params.giscus.enable }} {{partial "github-comments.html"
+.}} {{ end }} {{partial "go-to-top.html" .}} {{ end }} {{ end }}

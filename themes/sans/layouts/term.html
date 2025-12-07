@@ -1,0 +1,92 @@
+{{ define "main" }}
+{{ $contact := .Site.Params.social.email | default "mailto:kumar836@purdue.edu" }}
+{{ $aboutSummary := .Site.Params.homepage.homePageAbout }}
+{{ with .Site.GetPage "pages/about" }}
+  {{ $aboutSummary = .Params.summary | default $aboutSummary }}
+{{ end }}
+
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <p class="post-meta">Author</p>
+      <h1 class="hero-title">{{ .Title }}</h1>
+      {{ if $aboutSummary }}
+      <p class="hero-subtitle">{{ $aboutSummary }}</p>
+      {{ end }}
+      <div class="hero-cta">
+        <a href="{{ "pages/resume/" | relURL }}" class="btn btn-primary">Resume</a>
+        <a href="{{ $contact }}" class="btn btn-secondary">Contact</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{{ $posts := where .Pages "Section" "posts" }}
+{{ if gt (len $posts) 0 }}
+<section class="recent-posts-section">
+  <div class="section-header">
+    <h2>Writing</h2>
+    <p>Recent posts by {{ .Title }}.</p>
+  </div>
+  <div class="posts-grid">
+    {{ range (sort $posts "Date" "desc") }}
+    <article class="post-card">
+      <div class="post-content">
+        <div class="post-meta">
+          <span class="post-date">{{ .Date | time.Format ":date_long" }}</span>
+        </div>
+        <h3 class="post-title">
+          <a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        </h3>
+        <p class="post-summary">{{ .Summary | plainify | truncate 200 }}</p>
+        <div class="post-footer">
+          {{ $readingTime := div (float .WordCount) .Site.Params.posts.readingSpeed }}
+          {{ $readingTime = math.Ceil $readingTime }}
+          <span class="reading-time">{{ $readingTime }} min read</span>
+          <a href="{{ .RelPermalink }}" class="read-more">Read more →</a>
+        </div>
+      </div>
+    </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+
+{{ $projects := where .Pages "Section" "projects" }}
+{{ if gt (len $projects) 0 }}
+<section class="recent-posts-section">
+  <div class="section-header">
+    <h2>Projects</h2>
+    <p>Selected projects and case studies.</p>
+  </div>
+  <div class="posts-grid">
+    {{ range (sort $projects "Date" "desc") }}
+    <article class="post-card">
+      <div class="post-content">
+        <div class="post-meta">
+          <span>{{ .Date | time.Format "Jan 2006" }}</span>
+        </div>
+        <h3 class="post-title">
+          <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </h3>
+        <p class="post-summary">{{ .Summary | plainify | truncate 200 }}</p>
+        <div class="post-footer">
+          <a href="{{ .RelPermalink }}" class="read-more">Read more →</a>
+          {{ with .Params.link_demo }}
+            {{ if . }}
+            <a href="{{ . }}" class="read-more" target="_blank" rel="noopener">Demo</a>
+            {{ end }}
+          {{ end }}
+          {{ with .Params.link_github }}
+            {{ if . }}
+            <a href="{{ . }}" class="read-more" target="_blank" rel="noopener">Code</a>
+            {{ end }}
+          {{ end }}
+        </div>
+      </div>
+    </article>
+    {{ end }}
+  </div>
+</section>
+{{ end }}
+{{ end }}

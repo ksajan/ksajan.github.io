@@ -1,0 +1,38 @@
+{{/*  usign id may cause problem if more than one table is used in a single post  */}}
+
+
+<!-- layouts/shortcodes/table.html -->
+{{- $caption := .Get "caption" -}}
+{{- $id := $caption | urlize | default "" -}}
+<div class="table-wrapper">
+<table class="custom-table"{{- if $id }} id="{{ $id }}"{{- end -}}>
+  {{- if .IsNamedParams -}}
+    {{- if .Get "headers" -}}
+      <thead>
+        <tr>
+          {{- range (split (.Get "headers") "|") -}}
+            <th>{{ trim . " " }}</th>
+          {{- end -}}
+        </tr>
+      </thead>
+    {{- end -}}
+  {{- end -}}
+  <tbody>
+    {{- $rows := split (trim .Inner "\n\r") "\n" -}}
+    {{- range $rows -}}
+      {{- $trimmedRow := trim . " \t\r" -}}
+      {{- if gt (len $trimmedRow) 0 -}}
+        <tr>
+          {{- $cells := split $trimmedRow "|" -}}
+          {{- range $cells -}}
+            <td>{{ trim . " " | default "&nbsp;" }}</td>
+          {{- end -}}
+        </tr>
+      {{- end -}}
+    {{- end -}}
+  </tbody>
+  {{ if .Get "caption"}}
+  <caption class="table-caption"><b>Table: </b>{{ .Get "caption" }}</caption>
+  {{end}}
+</table>
+</div>

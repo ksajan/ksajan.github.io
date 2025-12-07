@@ -1,0 +1,41 @@
+<style>
+:root {
+  --site-font: {{ .Site.Params.fonts.siteFont | default "Georgia, serif" }};
+        /* Background Colors */
+  --light-color: {{ .Site.Params.theme.lightModeColor | default "white" }};
+  --dark-color: {{ .Site.Params.theme.darkModeColor | default "#333333" }};
+      
+      /* Link Colors */
+   --light-link-color: {{ .Site.Params.theme.lightModeLinkColor | default "#00e" }};    --dark-link-color: {{ .Site.Params.theme.darkModeLinkColor | default "#CCCCCC" }};
+      
+      /* Hero Section Colors */
+   --hero-section-color: {{ .Site.Params.theme.heroSectionColor | default "white" }};    --dark-hero-section-color: {{ .Site.Params.theme.darkHeroSectionColor | default "black" }};
+      
+      /* Button Colors - Light Mode */
+      --light-mode-button: {{ .Site.Params.theme.lightModeButton | default "#007bff" }};
+      --light-mode-button-text: {{ .Site.Params.theme.lightModeButtonText | default "#ffffff" }};
+      --light-mode-button-alt: {{ .Site.Params.theme.lightModeButtonAlt | default "transparent" }};
+      --light-mode-button-alt-text: {{ .Site.Params.theme.lightModeButtonAltText | default "#007bff" }};
+      
+      /* Button Colors - Dark Mode */
+      --dark-mode-button: {{ .Site.Params.theme.darkModeButton | default "#0d6efd" }};
+      --dark-mode-button-text: {{ .Site.Params.theme.darkModeButtonText | default "#ffffff" }};
+      --dark-mode-button-alt: {{ .Site.Params.theme.darkModeButtonAlt | default "transparent" }};
+      --dark-mode-button-alt-text: {{ .Site.Params.theme.darkModeButtonAltText | default "#4d9aff" }};
+
+    --hero-section-color : {{ .Site.Params.theme.heroSectionColor }};
+    --dark-hero-section-color : {{ .Site.Params.theme.darkHeroSectionColor }};
+
+      --btn-primary-bg: {{ .Site.Params.theme.lightModeButton }};
+  --btn-primary-color: {{ .Site.Params.theme.lightModeButtonText }};
+  --btn-secondary-bg: {{ .Site.Params.theme.lightModeButtonAlt }};
+  --btn-secondary-color: {{ .Site.Params.theme.lightModeButtonAltText }};
+
+   }
+body.dark-mode {
+  --btn-primary-bg: {{ .Site.Params.theme.darkModeButton }};
+  --btn-primary-color: {{ .Site.Params.theme.darkModeButtonText }};
+  --btn-secondary-bg: {{ .Site.Params.theme.darkModeButtonAlt }};
+  --btn-secondary-color: {{ .Site.Params.theme.darkModeButtonAltText }};
+}
+</style>

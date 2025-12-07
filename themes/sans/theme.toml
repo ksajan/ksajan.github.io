@@ -1,0 +1,17 @@
+name = "sans"
+license = "MIT"
+licenselink = "https://github.com/psugam/sans/blob/master/LICENSE"
+description = "A minimal theme for Hugo."
+
+homepage = "https://github.com/psugam/sans/"
+demosite = "https://sans-theme.pages.dev"
+
+tags = ["blog", "minimal", "responsive", "dark mode", "dark", "light", "personal"]
+features = ["syntax highlighting", "dark mode", "search"]
+min_version="0.146.0"
+
+[author]
+  name = "Sugam Pokharel"
+  homepage = "https://sugam-pokharel.com.np/"
+
+

@@ -1,0 +1,17 @@
+<div id="logo-block">
+    {{/*  from static/images  */}}
+    {{ $imagePath := .Site.Params.homepage.homePageLogoPath }}
+    <img id="logo-image" src="{{ $imagePath | relURL }}" alt="{{ .Site.Params.homepage.homePageTitle }}" />
+    
+    <h2 id="home-page-title">
+        {{ .Site.Params.homepage.homePageTitle }}
+    </h2>
+    <h4 id="home-page-tag">
+        {{ .Site.Params.homepage.homePageTagline }}
+    </h4>
+    <p id="home-page-about">
+        {{ .Site.Params.homepage.homePageAbout }}
+    </p>
+</div>
+
+{{ partial "media-links.html" . }}

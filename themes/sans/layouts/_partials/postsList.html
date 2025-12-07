@@ -1,0 +1,62 @@
+<div class="home-page-main-div">
+  <div id="home-posts-page">
+  {{ $homePageMode := .Site.Params.homepage.onlyPostsInHomePage }}
+  {{ if $homePageMode }} 
+      {{ .Content }} 
+
+  <!-- This one is for the home page. As for now, the entire content is shown in the homepage with the title. This will be chamged. -->
+  {{ $pages := where site.RegularPages "Type" "posts" }} 
+  {{ $paginator := .Paginate $pages }} 
+  {{ range $paginator.Pages }}
+  <div>
+    <a
+      href="{{ .RelPermalink }}"
+      style="display: inline-block; margin-right: 8px; font-size: large"
+    >
+      {{ .LinkTitle }}
+    </a>
+           {{ $dateMachine := .Date | time.Format "2006-01-02T15:04:05-07:00" }}
+    {{ $dateHuman := .Date | time.Format .Site.Params.homepage.dateFormat}}
+    <p
+      style="display: inline; margin: 0; font-size: smaller"
+      data-pagefind-meta="date"
+    >
+      {{ $dateHuman }}
+    </p>
+  </div>
+  <!-- {{ .Summary }} -->
+  {{ end }}
+  <!-- pagination  -->
+  {{ if gt $paginator.TotalPages 1 }} {{ $current := $paginator.PageNumber }} {{
+  $start := sub $current 2 }} {{ $end := add $current 2 }} {{ if lt $start 1
+  }}{{ $start = 1 }}{{ end }} {{ if gt $end $paginator.TotalPages }}{{ $end =
+  $paginator.TotalPages }}{{ end }}
+
+  <nav class="pagination">
+    {{ if $paginator.HasPrev }}
+    <a href="{{ $paginator.Prev.URL }}" class="page-link">← Prev</a>
+    {{ end }} {{ range $i := seq $start $end }} {{ $page := index
+    $paginator.Pagers (sub $i 1) }} {{ if eq $i $current }}
+    <span class="page-link active">{{ $i }}</span>
+    {{ else }}
+    <a href="{{ $page.URL }}" class="page-link">{{ $i }}</a>
+    {{ end }} {{ end }} {{ if $paginator.HasNext }}
+    <a href="{{ $paginator.Next.URL }}" class="page-link">Next →</a>
+    {{ end }}
+  </nav>
+  {{ end }} 
+  </div>
+  {{ else }}
+
+
+  <div id="home-intro-page">
+    <div class="home-intro-center">
+      {{ if .Site.Params.homepage.homePageLogo }}
+            {{ partial "logo-page.html" .}} 
+      {{else}}
+        {{partial "cover-page.html" .}}
+      {{end}}
+    </div>
+  </div>
+  {{ end }}
+</div>

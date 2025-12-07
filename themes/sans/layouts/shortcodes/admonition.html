@@ -1,0 +1,18 @@
+
+{{ $type := .Get "type" | default "note" }}
+{{ $title := .Get "title" | default (title $type) }}
+
+<div class="admonition admonition-{{ $type }}">
+  <div class="admonition-title">
+ {{ if eq $type "note" }}💡{{ end }}
+  {{ if eq $type "tip" }}✅{{ end }}
+  {{ if eq $type "info" }}ℹ️{{ end }}
+  {{ if eq $type "warning" }}⚠️{{ end }}
+  {{ if eq $type "danger" }}❌{{ end }}
+  {{ $title }}
+</div>
+  <div class="admonition-content">
+    {{ .Inner | markdownify }}
+  </div>
+</div>
+

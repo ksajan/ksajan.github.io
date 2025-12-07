@@ -1,0 +1,8 @@
+{{ $href := .Get "href" | default "#" }}
+{{ $target := .Get "target" | default "_self" }}
+
+{{/*  the href value for headers in post should be the name of the header in lowercase separated by dash -  */}}
+<a id="button-shortcode"href="{{ $href }}" target="{{ $target }}">
+    {{ .Inner }}
+</a>
+

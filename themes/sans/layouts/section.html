@@ -1,0 +1,131 @@
+  {{ define "main" }}
+<div class="posts-info-box">
+<h1>{{ .Title }}</h1>
+  {{ .Content }} 
+</div>
+{{ $pages := .RegularPages }}
+{{$paginator := .Paginate $pages }}
+
+<div class="section-controls">
+  <div class="view-toggle">
+    <button class="view-btn active" data-view-toggle="list">List</button>
+    <button class="view-btn" data-view-toggle="cards">Cards</button>
+  </div>
+</div>
+
+<div id="section-list" class="section-list list-view">
+  {{ range $paginator.Pages }}
+  {{ $cover := "" }}
+  {{ with .Params.cover }}{{ with .image }}{{ $cover = . }}{{ end }}{{ end }}
+  {{ if not $cover }}{{ with .Params.image }}{{ $cover = . }}{{ end }}{{ end }}
+  {{ if not $cover }}{{ with .Params.thumbnail }}{{ $cover = . }}{{ end }}{{ end }}
+
+  {{ $coverResource := "" }}
+  {{ if $cover }}
+    {{ $coverResource = .Resources.GetMatch $cover }}
+  {{ end }}
+
+  <article class="section-main-box">
+    {{ if and .Site.Params.sections.showCoverImage (or $coverResource $cover) }}
+      {{ if $coverResource }}
+      <div class="section-cover-image">
+        <a href="{{ .RelPermalink }}">
+          <img src="{{ $coverResource.RelPermalink }}" alt="{{ .Title }}" loading="lazy">
+        </a>
+      </div>
+      {{ else }}
+        {{/* If static path, render directly */}}
+        <div class="section-cover-image">
+          <a href="{{ .RelPermalink }}">
+            <img src="{{ $cover | relURL }}" alt="{{ .Title }}" loading="lazy">
+          </a>
+        </div>
+      {{ end }}
+    {{ end }}
+
+    <div class="section-card-body">
+      <h2 id="section-post-title"><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></h2>
+
+      <div class="section-meta-data-div">
+        {{ if .Site.Params.sections.showDate }}
+          {{ $dateMachine := .Date.Format "2006-01-02T15:04:05-07:00" }}
+          {{ $dateHuman := .Date.Format .Site.Params.sections.dateFormat }}
+          <time datetime="{{ $dateMachine }}">{{ $dateHuman }}</time>
+        {{ end }}
+      </div>
+
+      {{$summaryLength := .Site.Params.sections.summaryLength}}
+
+      {{ $plain := .RawContent }}
+      {{ $plain = $plain | replaceRE `(?s)\{\{<\s*\w+[^>]*>\}\}.*?\{\{<\s*/\w+\s*>\}\}` "" }}
+      {{ $plain = $plain | replaceRE `\{\{[^}]+\}\}` "" }}
+      {{ $plain = $plain | replaceRE `(?m)^#+\s+.*$` "" }}
+      {{ $plain = $plain | replaceRE `\[\^[^\]]+\]` "" }}
+      {{ $plain = $plain | replaceRE `(?m)^\[\^[^\]]+\]:.*$` "" }}
+      {{ $plain = $plain | plainify }}
+      {{ $plain = $plain | replaceRE `\s+` " " | strings.TrimSpace }}
+      {{ $plain = $plain | truncate $summaryLength }}
+      {{if .Site.Params.sections.showSummary}}
+      <p>{{ $plain }}</p>
+      {{end}}
+
+      {{if .Site.Params.sections.showReadMore}}
+      <p><a href="{{ .RelPermalink }}">Read more...</a></p>
+      {{end}}
+    </div>
+  </article>
+  {{ end }}
+</div>
+
+{{ if gt $paginator.TotalPages 1 }} 
+ {{ $current := $paginator.PageNumber }} 
+ {{ $start := sub $current 2}} 
+ {{ $end := add $current 2 }} 
+ {{ if lt $start 1 }}
+ {{ $start = 1 }}
+ {{ end }} 
+ {{if gt $end $paginator.TotalPages }}
+ {{ $end = $paginator.TotalPages }}
+ {{ end }}
+
+<nav class="pagination">
+  {{ if $paginator.HasPrev }}
+  <a
+    href="{{ $paginator.Prev.URL }}"
+    >← Prev</a
+  >
+  {{ end }} {{ range $i := seq $start $end }} {{ $page := index
+  $paginator.Pagers (sub $i 1) }} {{ if eq $i $current }}
+  <span>{{ $i }}</span>
+  {{ else }}
+  <a
+    href="{{ $page.URL }}"
+    >{{ $i }}</a
+  >
+  {{ end }} {{ end }} {{ if $paginator.HasNext }}
+  <a
+    href="{{ $paginator.Next.URL }}"
+    >Next →</a
+  >
+  {{ end }}
+</nav>
+
+{{ end }}
+
+<script>
+  (() => {
+    const listEl = document.getElementById('section-list');
+    if (!listEl) return;
+    const buttons = document.querySelectorAll('[data-view-toggle]');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const view = btn.getAttribute('data-view-toggle');
+        listEl.classList.remove('cards-view', 'list-view');
+        listEl.classList.add(view === 'list' ? 'list-view' : 'cards-view');
+      });
+    });
+  })();
+</script>
+{{ end }}

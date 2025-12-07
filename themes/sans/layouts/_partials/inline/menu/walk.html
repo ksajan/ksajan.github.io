@@ -1,0 +1,63 @@
+{{- /*
+This one Recursively renders a menu tree for the given page and list of menu entries.
+
+Behavior:
+  • Iterates over all provided menu entries.
+  • Builds a dynamic attribute map (`$attrs`) for each <a> element:
+        - Starts with the menu entry URL.
+        - Merges any custom parameters defined in the menu configuration.
+  • Determines whether the current page matches the menu entry:
+        - If this page *is* the active menu item: adds `class="active"` and `aria-current="page"`.
+        - If the menu entry is an ancestor of the current page: adds `class="ancestor"`.
+
+Example usage inside another partial:
+  {{ partial "inline/menu/walk.html" (dict "page" . "menuEntries" .Site.Menus.main) }}
+
+*/ -}}
+
+
+
+{{- $page := .page }}
+
+{{- range .menuEntries }}
+
+
+    {{- $attrs := dict "href" .URL }}
+
+
+    {{- with .Params }}
+        {{- range $k, $v := . }}
+            {{- $attrs = merge $attrs (dict $k $v) }}
+        {{- end }}
+    {{- end }}
+
+    {{- if $page.IsMenuCurrent .Menu . }}
+        {{- $attrs = merge $attrs (dict "class" "active" "aria-current" "page") }}
+    {{- else if $page.HasMenuCurrent .Menu . }}
+        {{- $attrs = merge $attrs (dict "class" "ancestor" "aria-current" "true") }}
+    {{- end }}
+
+    {{- $name := .Name }}
+    {{- with .Identifier }}
+        {{- with T . }}
+            {{- $name = . }}
+        {{- end }}
+    {{- end }}
+
+    <li>
+        <a
+            {{- range $k, $v := $attrs }}
+                {{- with $v }}
+                    {{- printf " %s=%q" $k $v | safeHTMLAttr }}
+                {{- end }}
+            {{- end }}
+        >{{ $name }}</a>
+
+        {{- with .Children }}
+        <ul>
+            {{- partial "inline/menu/walk.html" (dict "page" $page "menuEntries" .) }}
+        </ul>
+        {{- end }}
+    </li>
+
+{{- end }}

@@ -1,0 +1,233 @@
+{{ $imagePath := .Site.Params.homepage.homePageCoverPath }}
+
+{{/* Hero Section */}}
+<section class="hero-section">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title">{{.Site.Params.homepage.homePageCoverTitle}}</h1>
+      <p class="hero-subtitle">{{.Site.Params.homepage.homePageCoverTagLine}}</p>
+      <div class="hero-cta">
+
+
+<a href="{{ .Site.BaseURL }}posts/" class="btn btn-primary">Explore Articles</a>
+
+<a href="{{.Site.BaseURL }}pages/about/" class="btn btn-secondary">About Us</a>
+      </div>
+    </div>
+    {{ if $imagePath }}
+    <div class="hero-image">
+      <img src="{{ $imagePath | relURL }}" alt="Hero" />
+    </div>
+    {{ end }}
+  </div>
+</section>
+
+
+{{/* Stats Section */}}
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ len (where site.RegularPages "Type" "posts") }}</div>
+      <div class="stat-label">Articles Published</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ len .Site.Taxonomies.authors }}</div>
+      <div class="stat-label">Contributing Authors</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ len .Site.Taxonomies.tags }}</div>
+      <div class="stat-label">Topics Covered</div>
+    </div>
+  </div>
+</section>
+
+
+{{/*  works only for netlift does nothing otherwise  */}}
+<section class="newsletter-section">
+  <div class="newsletter-content">
+    <h2>Stay Updated</h2>
+    <p>
+      Subscribe to our newsletter and never miss a post.
+      Get the latest articles delivered directly to your inbox.
+    </p>
+
+    <!-- Netlify-enabled form -->
+    <form
+      name="newsletter"
+      method="POST"
+      data-netlify="true"
+      class="newsletter-form"
+      id="newsletter-form"
+    >
+      <input
+        type="email"
+        name="email"
+        id="newsletter-email"
+        placeholder="Enter your email"
+        required
+      />
+      <button type="submit" class="btn btn-primary" id="newsletter-submit">
+        Subscribe
+      </button>
+
+      <!-- Optional: Netlify anti-bot field -->
+      <div style="display:none">
+        <label>Don't fill this out: <input name="bot-field" /></label>
+      </div>
+
+      <!-- Hidden input so Netlify recognizes this form -->
+      <input type="hidden" name="form-name" value="newsletter" />
+    </form>
+
+    <!-- Success/Failure messages -->
+    <p id="newsletter-message" class="newsletter-message" style="display:none;"></p>
+  </div>
+</section>
+
+
+{{/* Recent Posts */}}
+<section class="recent-posts-section">
+  <div class="section-header">
+    <h2>Recent Posts</h2>
+    <p>Latest articles from our community</p>
+  </div>
+
+  {{ $pages := where site.RegularPages "Type" "posts" }}
+  {{ $paginator := .Paginate $pages }}
+
+  <div class="posts-grid">
+    {{ range $paginator.Pages }}
+    <article class="post-card">
+      {{ $cover := "" }}
+      {{ with .Params.cover }}
+        {{ $cover = .image }}
+      {{ end }}
+      
+      {{/* Try to get image from page bundle first, then fallback to static */}}
+      {{ $imageResource := .Resources.GetMatch $cover }}
+      {{ if not $imageResource }}
+        {{ $defaultPath := "images/default.jpg" }}
+        {{ $imageResource = .Resources.GetMatch $defaultPath }}
+        {{ if not $imageResource }}
+          {{/* Fallback to static folder */}}
+          {{ $cover = "/images/default.jpg" }}
+        {{ else }}
+          {{ $cover = $imageResource.RelPermalink }}
+        {{ end }}
+      {{ else }}
+        {{ $cover = $imageResource.RelPermalink }}
+      {{ end }}
+      
+      {{ if $cover }}
+      <div class="post-image">
+        <a href="{{ .Permalink }}">
+          <img src="{{ $cover | relURL }}" alt="{{ .LinkTitle }}" loading="lazy" />
+        </a>
+      </div>
+      {{ end }}
+
+      <div class="post-content">
+        <div class="post-meta">
+          {{ partial "terms.html" (dict "taxonomy" "authors" "page" .) }}
+          <span class="post-date">
+            {{ $dateHuman := .Date | time.Format ":date_long" }}
+            {{ $dateHuman }}
+          </span>
+        </div>
+
+        <h3 class="post-title">
+          <a href="{{ .Permalink }}">{{ .LinkTitle }}</a>
+        </h3>
+
+       
+
+{{/* Custom summary cleaner to remove HTML & shortcodes */}}
+{{ $plain := .RawContent }}
+
+{{ $plain = $plain | replaceRE `(?s)\{\{<\s*\w+[^>]*>\}\}.*?\{\{<\s*/\w+\s*>\}\}` "" }}
+
+{{ $plain = $plain | replaceRE `\{\{[^}]+\}\}` "" }}
+
+{{ $plain = $plain | replaceRE `(?m)^#+\s+.*$` "" }}
+
+{{ $plain = $plain | replaceRE `\[\^[^\]]+\]` "" }}
+
+{{ $plain = $plain | replaceRE `(?m)^\[\^[^\]]+\]:.*$` "" }}
+
+{{ $plain = $plain | plainify }}
+
+{{ $plain = $plain | replaceRE `\s+` " " | strings.TrimSpace }}
+{{ $plain = $plain | truncate 200 }}
+<p class="post-summary">{{ $plain }}</p>
+
+
+        <div class="post-footer">
+          {{ $readingTime := div (float .WordCount) .Site.Params.posts.readingSpeed }}
+          {{ $readingTime = math.Ceil $readingTime }}
+          <span class="reading-time">{{ $readingTime }} min read</span>
+          <a href="{{ .Permalink }}" class="read-more">Read More →</a>
+        </div>
+      </div>
+    </article>
+    {{ end }}
+  </div>
+
+  {{ if gt $paginator.TotalPages 1 }}
+  {{ $current := $paginator.PageNumber }}
+  {{ $start := sub $current 2 }}
+  {{ $end := add $current 2 }}
+  {{ if lt $start 1 }}{{ $start = 1 }}{{ end }}
+  {{ if gt $end $paginator.TotalPages }}{{ $end = $paginator.TotalPages }}{{ end }}
+  
+  <nav class="pagination">
+    {{ if $paginator.HasPrev }}
+    <a href="{{ $paginator.Prev.URL }}" class="pagination-btn">← Prev</a>
+    {{ end }}
+    
+    <div class="pagination-numbers">
+      {{ range $i := seq $start $end }}
+      {{ $page := index $paginator.Pagers (sub $i 1) }}
+      {{ if eq $i $current }}
+      <span class="pagination-number active">{{ $i }}</span>
+      {{ else }}
+      <a href="{{ $page.URL }}" class="pagination-number">{{ $i }}</a>
+      {{ end }}
+      {{ end }}
+    </div>
+    
+    {{ if $paginator.HasNext }}
+    <a href="{{ $paginator.Next.URL }}" class="pagination-btn">Next →</a>
+    {{ end }}
+  </nav>
+  {{ end }}
+</section>
+
+
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+  const form = document.getElementById("newsletter-form");
+  const message = document.getElementById("newsletter-message");
+
+  form.addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const data = new FormData(form);
+
+    try {
+      await fetch("/", {
+        method: "POST",
+        body: data
+      });
+      form.reset();
+      message.style.display = "block";
+      message.textContent = "Thanks for subscribing!";
+      message.style.color = "var(--accent, #007bff)";
+    } catch (error) {
+      message.style.display = "block";
+      message.textContent = "❌ Something went wrong. Please try again.";
+      message.style.color = "red";
+    }
+  });
+});
+</script>
