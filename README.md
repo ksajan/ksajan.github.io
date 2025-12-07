@@ -1,6 +1,6 @@
 # ksajan.github.io
 
-Personal portfolio + writing site built with Hugo. Dark mode, inline search with tag filters on Writing, and an embedded resume.
+Personal portfolio + writing site built with Hugo. Dark mode, inline search with tags and content on Blogs.
 
 Run locally:
 ```bash
