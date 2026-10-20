@@ -9,20 +9,39 @@ authors = ["Sajan Kumar"]
 cover = ""
 +++
 
-Security analysts were drowning in alerts, and manual triage slowed feature delivery. We needed automation that reduced noise but still kept humans in control.
+Security analysts were drowning in alerts. Every alert needed someone to pull context, read logs and decide whether it mattered, and most of them did not. Manual triage also slowed the product teams down, since security checks sat in the path of shipping.
 
-## Approach
-- Framed the workflow as a graph of agents: intake -> retrieval and enrichment -> reasoning -> suggested actions. LangGraph made the state explicit and debuggable.
-- Combined hybrid search with custom rerankers to prioritize evidence before the reasoning step. This dropped irrelevant context and reduced token use.
-- Served fine-tuned models on vLLM with tensor parallelism to hit sub-second latencies while keeping costs predictable.
-- Added evaluation hooks and red-team prompts in CI to guard against regressions as we iterated.
+We wanted automation that removed the noise without taking humans out of the decisions that count. The system we built works across about 20TB of security data, and the analysis that used to take hours now takes minutes.
 
-## Impact
-- 60-70% of threat triage is now automated, and analysis time dropped from hours to minutes.
-- Feature teams ship ~40% faster because security checks are programmatic and repeatable.
-- Customers get consistent summaries plus the raw evidence bundle, so trust stays high even as automation grows.
+## Make the workflow a graph
 
-## Lessons learned
-- Keep agents small and observable; most wins came from better retrieval and ranking, not bigger models.
-- Invest early in evals and playbooks so on-call engineers can reason about failures quickly.
-- Make handoffs obvious: every automated decision links back to source evidence so humans can override safely.
+The first decision was to stop treating triage as one big prompt. We modeled it as a graph of small agents, each with one job:
+
+1. **Intake** takes the alert and normalizes it.
+2. **Retrieval and enrichment** pulls the evidence: related events, the asset, history.
+3. **Reasoning** weighs that evidence and reaches a conclusion.
+4. **Suggested actions** turns the conclusion into something an analyst can act on.
+
+LangGraph made the state between those steps explicit. When something went wrong, we could see which step produced the bad output and what it was given, instead of guessing at a single opaque call.
+
+## Most of the gains came from retrieval
+
+The model was not the bottleneck. The context was. We combined hybrid search with custom rerankers so the reasoning step only saw the evidence that mattered. Dropping irrelevant context made the answers better and cut token use at the same time.
+
+## Serving
+
+We served models on vLLM with tensor parallelism, which got us sub-second latency with predictable cost. Some of those models were fine-tuned, but not to make them better at security reasoning. They were small models tuned for consistent output formats and for running cheap, high-volume steps. The reasoning came from a capable general model and from the evidence we put in front of it. I have since written more about why I think that split matters in [You Probably Don't Need Your Own Model](/blog/2026/10/you-probably-dont-need-your-own-model/).
+
+## Guarding against regressions
+
+Prompts, retrieval and models all change, and any of them can quietly make the system worse. We added evaluation hooks and red-team prompts to CI so a regression would show up before it reached analysts.
+
+## What it changed
+
+About 60-70% of threat triage is now automated. Feature teams ship around 40% faster because security checks are programmatic and repeatable instead of waiting on a person. Customers get a consistent summary along with the raw evidence behind it, so they can check the work rather than take it on trust.
+
+## What I would tell someone starting this
+
+- **Keep agents small and observable.** Most of our wins came from better retrieval and ranking, not bigger models.
+- **Build evals and playbooks early.** When something fails, the on-call engineer needs to work out why quickly, and that is hard to bolt on later.
+- **Make the handoff to humans obvious.** Every automated decision links back to its source evidence, so an analyst can override it safely. Automation that people cannot check does not get trusted, and automation that is not trusted does not get used.
