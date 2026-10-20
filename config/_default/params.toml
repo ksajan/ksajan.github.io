@@ -15,7 +15,7 @@
   showSocialLinksHome = true
 
 [fonts]
-  siteFont = "Inter, \"Helvetica Neue\", Arial, sans-serif"
+  siteFont = "Inter, Helvetica Neue, Arial, sans-serif"
 
 [social]
   github = "https://github.com/ksajan"
